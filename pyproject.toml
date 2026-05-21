@@ -17,6 +17,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "fastapi>=0.136.1",
     "ipykernel>=7.2.0",
     "python-dotenv>=1.2.2",
+    "uvicorn>=0.47.0",
 ]

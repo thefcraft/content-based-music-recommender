@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Recommendation System</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+        <h2>Your Songs</h2>
+
+        <div class="song-list">
+            {% for song in songs %}
+                <button
+                    class="song-btn"
+                    onclick='playSong({{ song['songname']|tojson }}, {{ song['songid']|tojson }})'
+                >
+                    {{ song['songname'] }}
+                </button>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <div class="main-content">
+
+        <div class="player-card">
+            <h1 id="currentSong">Select a song</h1>
+
+            <audio
+                id="audioPlayer"
+                controls
+            >
+            </audio>
+        </div>
+
+
+        <div class="recommendation-card">
+            <div class="recommendation-header">
+                <h2>Recommendations</h2>
+            </div>
+
+            <div id="recommendations">
+                No recommendations yet.
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
