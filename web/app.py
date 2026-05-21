@@ -13,7 +13,7 @@ from fastapi.requests import Request
 from src.config import Config
 from src.encoder import AudioEncoder
 from src import utils
-from base64 import b64decode, b64encode
+from base64 import urlsafe_b64decode, urlsafe_b64encode
 from inference import (
     InferenceAudioProcessor,
     aggregate_query_results,
@@ -135,7 +135,7 @@ async def home(request: Request):
             "songs": [
                 {
                     "songname": song,
-                    "songid": b64encode(song.encode()).decode(),
+                    "songid": urlsafe_b64encode(song.encode()).decode(),
                 }
                 for song in songs
             ],
@@ -145,14 +145,14 @@ async def home(request: Request):
 
 @app.get("/api/recommend/{songid}")
 async def get_recommendations(songid: str):  # pyright: ignore[reportUnknownParameterType]
-    song_name = b64decode(songid.encode()).decode()
+    song_name = urlsafe_b64decode(songid.encode()).decode()
     results = recommend(song_name)
 
     return {
         "query": song_name,
         "recommendations": [
             {
-                "id": b64encode(result["filename"].encode()).decode(),  # type: ignore
+                "id": urlsafe_b64encode(result["filename"].encode()).decode(),  # type: ignore
                 **result,
             }
             for result in results
@@ -162,7 +162,7 @@ async def get_recommendations(songid: str):  # pyright: ignore[reportUnknownPara
 
 @app.get("/music/{songid}")
 async def stream_music(songid: str):
-    song_name = b64decode(songid.encode()).decode()
+    song_name = urlsafe_b64decode(songid.encode()).decode()
     file_path = config.music_dir.joinpath(song_name)
 
     return FileResponse(file_path)
