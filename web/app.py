@@ -89,11 +89,11 @@ def get_song_embeddings(song_path: Path):
 
 @torch.no_grad()
 def recommend(song_name: str, top_k: int = 10):
-    global session_mood_embedding
     song_path = config.music_dir.joinpath(song_name)
 
     embeddings = get_song_embeddings(song_path)
     if SESSION_BASED:
+        global session_mood_embedding
         if session_mood_embedding is None:
             session_mood_embedding = embeddings
         else:
@@ -150,6 +150,9 @@ def recommend(song_name: str, top_k: int = 10):
 # =========================
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    global history, session_mood_embedding
+    history = set()
+    session_mood_embedding = None
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -184,9 +187,10 @@ async def get_recommendations(songid: str):  # pyright: ignore[reportUnknownPara
 
 @app.get("/music/{songid}")
 async def stream_music(songid: str):
-    global history
     song_name = urlsafe_b64decode(songid.encode()).decode()
-    history.add(song_name)
+    if not RECOMMEND_WATCHED:
+        global history
+        history.add(song_name)
     file_path = config.music_dir.joinpath(song_name)
 
     return FileResponse(file_path)
